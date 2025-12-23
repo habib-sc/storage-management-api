@@ -93,8 +93,20 @@ const createTextFile = async (fileData, ownerId, email) => {
   return textFile;
 };
 
+// get folder content service
+const getFolderContent = async (parentFolderId, ownerId) => {
+  const query = {
+    owner: ownerId,
+    parentFolder: parentFolderId ? parentFolderId : null,
+  };
+
+  const content = await Document.find(query).sort({ type: 1, name: 1 });
+  return content;
+};
+
 export const DocumentService = {
   createFolder,
   uploadFile,
   createTextFile,
+  getFolderContent,
 };

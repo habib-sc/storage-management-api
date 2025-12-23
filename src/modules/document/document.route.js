@@ -13,5 +13,6 @@ router.post(
   DocumentController.uploadFile
 );
 router.post("/text", auth(), DocumentController.createTextFile);
+router.get("/", auth(), DocumentController.getFolderContent);
 
 export const DocumentRoutes = router;

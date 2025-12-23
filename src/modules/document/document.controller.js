@@ -62,8 +62,27 @@ const createTextFile = async (req, res, next) => {
   }
 };
 
+// get folder content controller
+const getFolderContent = async (req, res, next) => {
+  try {
+    const result = await DocumentService.getFolderContent(
+      req.query.parentFolder,
+      req.user.id
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Content retrieved successfully",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const DocumentController = {
   createFolder,
   uploadFile,
   createTextFile,
+  getFolderContent,
 };
