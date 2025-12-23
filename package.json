@@ -12,6 +12,7 @@
   "author": "habib97.cs@gmail.com",
   "license": "ISC",
   "dependencies": {
+    "agenda": "^5.0.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
@@ -20,7 +21,8 @@
     "http-status": "^2.1.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.0.2",
-    "morgan": "^1.10.1"
+    "morgan": "^1.10.1",
+    "nodemailer": "^7.0.12"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"

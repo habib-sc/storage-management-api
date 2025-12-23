@@ -52,7 +52,47 @@ const login = async (req, res, next) => {
   }
 };
 
+// forgot password controller
+const forgotPassword = async (req, res, next) => {
+  try {
+    const result = await AuthService.forgotPassword(req.body.email);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Verification code sent to email",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// reset password controller
+const resetPassword = async (req, res, next) => {
+  try {
+    const { verificationCode, email, newPassword, confirmPassword } = req.body;
+    const result = await AuthService.resetPassword(
+      verificationCode,
+      email,
+      newPassword,
+      confirmPassword
+    );
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Password reset successfully",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const AuthController = {
   signup,
   login,
+  forgotPassword,
+  resetPassword,
 };
