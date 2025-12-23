@@ -1,14 +1,11 @@
 import express from "express";
 import cors from "cors";
-import helmet from "helmet";
 import morgan from "morgan";
 import httpStatus from "http-status";
 import routes from "./routes/index.js";
+import sendResponse from "./utils/sendResponse.js";
 
 const app = express();
-
-// security headers
-app.use(helmet());
 
 // Logging
 if (process.env.NODE_ENV === "development") {
@@ -23,17 +20,22 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 // API Routes
-app.use("/api/v1", routes);
-
 app.get("/api/v1/health", (req, res) => {
-  res.status(httpStatus.OK).json({
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
     success: true,
     message: "Server is running",
   });
 });
 
+app.use("/api/v1", routes);
+
 // Global Error Handler
 app.use((err, req, res, next) => {
+  if (res.headersSent) {
+    return next(err);
+  }
+
   const statusCode = err.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
   res.status(statusCode).json({
     success: false,

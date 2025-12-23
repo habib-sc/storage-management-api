@@ -1,23 +1,12 @@
 import { UserService } from "./user.service.js";
 import httpStatus from "http-status";
-
-const createUser = async (req, res, next) => {
-  try {
-    const result = await UserService.createUser(req.body);
-    res.status(httpStatus.CREATED).json({
-      success: true,
-      message: "User created successfully",
-      data: result,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+import sendResponse from "../../utils/sendResponse.js";
 
 const getAllUsers = async (req, res, next) => {
   try {
     const result = await UserService.getAllUsers();
-    res.status(httpStatus.OK).json({
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
       success: true,
       message: "Users retrieved successfully",
       data: result,
@@ -28,6 +17,5 @@ const getAllUsers = async (req, res, next) => {
 };
 
 export const UserController = {
-  createUser,
   getAllUsers,
 };
