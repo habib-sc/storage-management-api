@@ -5,6 +5,12 @@ const getAllUsers = async () => {
   return users;
 };
 
+const getMe = async (id) => {
+  const user = await User.findById(id);
+  return user;
+};
+
 export const UserService = {
   getAllUsers,
+  getMe,
 };

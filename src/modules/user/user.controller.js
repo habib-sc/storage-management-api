@@ -16,6 +16,21 @@ const getAllUsers = async (req, res, next) => {
   }
 };
 
+const getMe = async (req, res, next) => {
+  try {
+    const result = await UserService.getMe(req.user.id);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "User detail retrieved successfully",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const UserController = {
   getAllUsers,
+  getMe,
 };
