@@ -43,7 +43,27 @@ const uploadFile = async (req, res, next) => {
   }
 };
 
+// create text file controller
+const createTextFile = async (req, res, next) => {
+  try {
+    const result = await DocumentService.createTextFile(
+      req.body,
+      req.user.id,
+      req.user.email
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.CREATED,
+      success: true,
+      message: "Text file created successfully",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const DocumentController = {
   createFolder,
   uploadFile,
+  createTextFile,
 };

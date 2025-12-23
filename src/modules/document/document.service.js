@@ -1,5 +1,6 @@
 import Document from "./document.model.js";
 import path from "path";
+import fs from "fs";
 
 // Create a new folder
 const createFolder = async (folderData, ownerId) => {
@@ -57,7 +58,43 @@ const uploadFile = async (fileData, file, ownerId) => {
   return newFile;
 };
 
+// create text file service
+const createTextFile = async (fileData, ownerId, email) => {
+  const { name, content, parentFolder } = fileData;
+
+  // Validate parent folder
+  if (parentFolder) {
+    const parent = await Document.findOne({
+      _id: parentFolder,
+      owner: ownerId,
+    });
+    if (!parent) {
+      throw new Error("Parent folder not found or unauthorized");
+    }
+    if (parent.type !== "folder") {
+      throw new Error("Parent must be a folder");
+    }
+  }
+
+  // create a txt file in uploads/users/{userEmail}/
+  const filePath = path.join("uploads", "users", email, `${name}.txt`);
+  fs.writeFileSync(filePath, content);
+
+  const textFile = await Document.create({
+    name,
+    type: "file",
+    parentFolder: parentFolder || null,
+    owner: ownerId,
+    extension: ".txt",
+    size: fs.statSync(filePath).size,
+    url: `/uploads/users/${email}/${name}.txt`,
+  });
+
+  return textFile;
+};
+
 export const DocumentService = {
   createFolder,
   uploadFile,
+  createTextFile,
 };

@@ -12,5 +12,6 @@ router.post(
   upload.single("file"),
   DocumentController.uploadFile
 );
+router.post("/text", auth(), DocumentController.createTextFile);
 
 export const DocumentRoutes = router;
