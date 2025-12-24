@@ -278,8 +278,12 @@ const getFavouriteDocuments = async (userId) => {
   return { totalItems: favourites.length, content: favourites };
 };
 
-// copy document service
-const copyDocument = async (documentId, ownerId, targetParentId = null) => {
+// duplicate document service
+const duplicateDocument = async (
+  documentId,
+  ownerId,
+  targetParentId = null
+) => {
   // Find source document
   const sourceDoc = await Document.findOne({ _id: documentId, owner: ownerId });
   if (!sourceDoc) {
@@ -294,13 +298,24 @@ const copyDocument = async (documentId, ownerId, targetParentId = null) => {
       ? `${name}_copy`
       : `${path.basename(name, extension)}_copy${extension}`;
 
+  // check if new name alrady exist then add _copy again and again
+  let newDocName = newName;
+  let count = 1;
+  while (await Document.findOne({ name: newDocName, owner: ownerId })) {
+    newDocName =
+      type === "folder"
+        ? `${name}_copy_${count}`
+        : `${path.basename(name, extension)}_copy_${count}${extension}`;
+    count++;
+  }
+
   let newUrl = url;
   if (type === "file" && url) {
     // Physical file copying logic
     const oldPath = path.join(process.cwd(), url);
     const dirName = path.dirname(url);
     const fileName = path.basename(url, extension);
-    const newFileName = `${fileName}_copy${extension}`;
+    const newFileName = `${newDocName}`;
     newUrl = path.join(dirName, newFileName).replace(/\\/g, "/");
     const newPath = path.join(process.cwd(), newUrl);
 
@@ -315,7 +330,7 @@ const copyDocument = async (documentId, ownerId, targetParentId = null) => {
   }
 
   const newDoc = await Document.create({
-    name: newName,
+    name: newDocName,
     type,
     parentFolder: targetParentId || parentFolder,
     owner: ownerId,
@@ -333,7 +348,7 @@ const copyDocument = async (documentId, ownerId, targetParentId = null) => {
     });
 
     for (const child of children) {
-      await copyDocument(child._id, ownerId, newDoc._id);
+      await duplicateDocument(child._id, ownerId, newDoc._id);
     }
   }
 
@@ -348,5 +363,5 @@ export const DocumentService = {
   getDashboardStats,
   toggleFavourite,
   getFavouriteDocuments,
-  copyDocument,
+  duplicateDocument,
 };

@@ -128,15 +128,15 @@ const getFavouriteDocuments = async (req, res, next) => {
   }
 };
 
-// copy document controller
-const copyDocument = async (req, res, next) => {
+// duplicate document controller
+const duplicateDocument = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const result = await DocumentService.copyDocument(id, req.user.id);
+    const result = await DocumentService.duplicateDocument(id, req.user.id);
     sendResponse(res, {
       statusCode: httpStatus.CREATED,
       success: true,
-      message: "Document copied successfully",
+      message: "Document duplicated successfully",
       data: result,
     });
   } catch (error) {
@@ -152,5 +152,5 @@ export const DocumentController = {
   getDashboardStats,
   toggleFavourite,
   getFavouriteDocuments,
-  copyDocument,
+  duplicateDocument,
 };
