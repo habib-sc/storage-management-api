@@ -24,5 +24,6 @@ router.patch(
 router.post("/duplicate/:id", auth(), DocumentController.duplicateDocument);
 router.post("/copy-to-folder/:id", auth(), DocumentController.copyToFolder);
 router.patch("/rename/:id", auth(), DocumentController.renameDocument);
+router.delete("/:id", auth(), DocumentController.deleteDocument);
 
 export const DocumentRoutes = router;

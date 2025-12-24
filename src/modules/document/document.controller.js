@@ -182,6 +182,22 @@ const renameDocument = async (req, res, next) => {
   }
 };
 
+// delete document controller
+const deleteDocument = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const result = await DocumentService.deleteDocument(id, req.user.id);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Document deleted successfully",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const DocumentController = {
   createFolder,
   uploadFile,
@@ -193,4 +209,5 @@ export const DocumentController = {
   duplicateDocument,
   copyToFolder,
   renameDocument,
+  deleteDocument,
 };

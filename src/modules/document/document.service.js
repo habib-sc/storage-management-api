@@ -407,6 +407,43 @@ const renameDocument = async (documentId, newName, userId) => {
   return updatedDoc;
 };
 
+// delete document service
+const deleteDocument = async (documentId, userId) => {
+  const document = await Document.findOne({ _id: documentId, owner: userId });
+  if (!document) {
+    throw new Error("Document not found or unauthorized");
+  }
+
+  const { type, url } = document;
+
+  if (type === "file" && url) {
+    const filePath = path.join(process.cwd(), url);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+  }
+
+  if (type === "folder") {
+    // Find all children and delete them recursively
+    const children = await Document.find({
+      parentFolder: documentId,
+      owner: userId,
+    });
+
+    for (const child of children) {
+      await deleteDocument(child._id, userId);
+    }
+  }
+
+  // Remove the document itself from DB
+  await Document.findByIdAndDelete(documentId);
+
+  // Also remove from Favourites if exists
+  await Favourite.deleteMany({ document: documentId });
+
+  return { message: "Document deleted successfully" };
+};
+
 export const DocumentService = {
   createFolder,
   uploadFile,
@@ -417,4 +454,5 @@ export const DocumentService = {
   getFavouriteDocuments,
   duplicateDocument,
   renameDocument,
+  deleteDocument,
 };
