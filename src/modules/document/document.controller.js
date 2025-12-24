@@ -66,7 +66,7 @@ const createTextFile = async (req, res, next) => {
 const getFolderContent = async (req, res, next) => {
   try {
     const result = await DocumentService.getFolderContent(
-      req.query.parentFolder,
+      req.query,
       req.user.id
     );
     sendResponse(res, {

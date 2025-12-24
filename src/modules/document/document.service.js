@@ -96,14 +96,27 @@ const createTextFile = async (fileData, ownerId, email) => {
 };
 
 // get folder content service
-const getFolderContent = async (parentFolderId, ownerId) => {
-  const query = {
-    owner: ownerId,
-    parentFolder: parentFolderId ? parentFolderId : null,
-  };
+const getFolderContent = async (queryParams, ownerId) => {
+  const queries = {};
 
-  const content = await Document.find(query).sort({ type: 1, name: 1 });
-  return content;
+  // filterable fields
+  const filterableFields = ["parentFolder", "type", "extension"];
+
+  filterableFields.forEach((field) => {
+    if (queryParams[field]) {
+      queries[field] = queryParams[field];
+    }
+  });
+
+  queries.owner = ownerId;
+  queries.parentFolder = queryParams.parentFolder
+    ? queryParams.parentFolder
+    : null;
+
+  const totalItems = await Document.countDocuments(queries);
+
+  const content = await Document.find(queries);
+  return { totalItems, content };
 };
 
 // get dashboard statistics service
