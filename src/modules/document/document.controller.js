@@ -165,6 +165,23 @@ const copyToFolder = async (req, res, next) => {
   }
 };
 
+// rename document controller
+const renameDocument = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { name } = req.body;
+    const result = await DocumentService.renameDocument(id, name, req.user.id);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Document renamed successfully",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const DocumentController = {
   createFolder,
   uploadFile,
@@ -175,4 +192,5 @@ export const DocumentController = {
   getFavouriteDocuments,
   duplicateDocument,
   copyToFolder,
+  renameDocument,
 };

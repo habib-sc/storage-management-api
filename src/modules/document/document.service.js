@@ -361,6 +361,52 @@ const duplicateDocument = async (
   return newDoc;
 };
 
+// rename document service
+const renameDocument = async (documentId, newName, userId) => {
+  const document = await Document.findOne({ _id: documentId, owner: userId });
+  if (!document) {
+    throw new Error("Document not found or unauthorized");
+  }
+
+  const { type, extension, url } = document;
+
+  // check if the name already exist with the same parent folder
+  const existingDocument = await Document.findOne({
+    name: newName,
+    owner: userId,
+    parentFolder: document.parentFolder,
+  });
+
+  if (existingDocument) {
+    throw new Error("Document name already exists");
+  }
+
+  let updateData = { name: newName };
+
+  if (type === "file" && url) {
+    const oldPath = path.join(process.cwd(), url);
+    const dirName = path.dirname(url);
+
+    // Construct new physical filename
+    // We keep the extension from the original document
+    const newPhysicalFileName = `${newName}${extension || path.extname(url)}`;
+    const newUrl = path.join(dirName, newPhysicalFileName).replace(/\\/g, "/");
+    const newPath = path.join(process.cwd(), newUrl);
+
+    if (fs.existsSync(oldPath)) {
+      fs.renameSync(oldPath, newPath);
+    }
+
+    updateData.url = newUrl;
+  }
+
+  const updatedDoc = await Document.findByIdAndUpdate(documentId, updateData, {
+    new: true,
+  });
+
+  return updatedDoc;
+};
+
 export const DocumentService = {
   createFolder,
   uploadFile,
@@ -370,4 +416,5 @@ export const DocumentService = {
   toggleFavourite,
   getFavouriteDocuments,
   duplicateDocument,
+  renameDocument,
 };
