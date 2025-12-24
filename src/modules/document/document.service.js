@@ -301,7 +301,13 @@ const duplicateDocument = async (
   // check if new name alrady exist then add _copy again and again
   let newDocName = newName;
   let count = 1;
-  while (await Document.findOne({ name: newDocName, owner: ownerId })) {
+  while (
+    await Document.findOne({
+      name: newDocName,
+      owner: ownerId,
+      parentFolder: targetParentId || parentFolder,
+    })
+  ) {
     newDocName =
       type === "folder"
         ? `${name}_copy_${count}`

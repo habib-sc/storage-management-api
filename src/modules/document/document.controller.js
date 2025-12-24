@@ -144,6 +144,27 @@ const duplicateDocument = async (req, res, next) => {
   }
 };
 
+// copy to folder controller
+const copyToFolder = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { targetFolderId } = req.body;
+    const result = await DocumentService.duplicateDocument(
+      id,
+      req.user.id,
+      targetFolderId
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.CREATED,
+      success: true,
+      message: "Document copied to folder successfully",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const DocumentController = {
   createFolder,
   uploadFile,
@@ -153,4 +174,5 @@ export const DocumentController = {
   toggleFavourite,
   getFavouriteDocuments,
   duplicateDocument,
+  copyToFolder,
 };
