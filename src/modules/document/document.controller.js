@@ -128,6 +128,22 @@ const getFavouriteDocuments = async (req, res, next) => {
   }
 };
 
+// copy document controller
+const copyDocument = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const result = await DocumentService.copyDocument(id, req.user.id);
+    sendResponse(res, {
+      statusCode: httpStatus.CREATED,
+      success: true,
+      message: "Document copied successfully",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const DocumentController = {
   createFolder,
   uploadFile,
@@ -136,4 +152,5 @@ export const DocumentController = {
   getDashboardStats,
   toggleFavourite,
   getFavouriteDocuments,
+  copyDocument,
 };

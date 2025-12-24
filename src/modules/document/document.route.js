@@ -21,5 +21,6 @@ router.patch(
   auth(),
   DocumentController.toggleFavourite
 );
+router.post("/copy/:id", auth(), DocumentController.copyDocument);
 
 export const DocumentRoutes = router;

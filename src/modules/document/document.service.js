@@ -278,6 +278,68 @@ const getFavouriteDocuments = async (userId) => {
   return { totalItems: favourites.length, content: favourites };
 };
 
+// copy document service
+const copyDocument = async (documentId, ownerId, targetParentId = null) => {
+  // Find source document
+  const sourceDoc = await Document.findOne({ _id: documentId, owner: ownerId });
+  if (!sourceDoc) {
+    throw new Error("Document not found or unauthorized");
+  }
+
+  const { name, type, parentFolder, extension, size, url, content } = sourceDoc;
+
+  // Create the new document
+  const newName =
+    type === "folder"
+      ? `${name}_copy`
+      : `${path.basename(name, extension)}_copy${extension}`;
+
+  let newUrl = url;
+  if (type === "file" && url) {
+    // Physical file copying logic
+    const oldPath = path.join(process.cwd(), url);
+    const dirName = path.dirname(url);
+    const fileName = path.basename(url, extension);
+    const newFileName = `${fileName}_copy${extension}`;
+    newUrl = path.join(dirName, newFileName).replace(/\\/g, "/");
+    const newPath = path.join(process.cwd(), newUrl);
+
+    if (fs.existsSync(oldPath)) {
+      // Create directory if it doesn't exist
+      const targetDir = path.dirname(newPath);
+      if (!fs.existsSync(targetDir)) {
+        fs.mkdirSync(targetDir, { recursive: true });
+      }
+      fs.copyFileSync(oldPath, newPath);
+    }
+  }
+
+  const newDoc = await Document.create({
+    name: newName,
+    type,
+    parentFolder: targetParentId || parentFolder,
+    owner: ownerId,
+    extension,
+    size,
+    url: newUrl,
+    content,
+  });
+
+  // If it's a folder then copy its children
+  if (type === "folder") {
+    const children = await Document.find({
+      parentFolder: documentId,
+      owner: ownerId,
+    });
+
+    for (const child of children) {
+      await copyDocument(child._id, ownerId, newDoc._id);
+    }
+  }
+
+  return newDoc;
+};
+
 export const DocumentService = {
   createFolder,
   uploadFile,
@@ -286,4 +348,5 @@ export const DocumentService = {
   getDashboardStats,
   toggleFavourite,
   getFavouriteDocuments,
+  copyDocument,
 };
