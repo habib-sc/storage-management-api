@@ -444,6 +444,25 @@ const deleteDocument = async (documentId, userId) => {
   return { message: "Document deleted successfully" };
 };
 
+// get file details for viewing service
+const getFileDetails = async (documentId, userId) => {
+  const document = await Document.findOne({ _id: documentId, owner: userId });
+  if (!document) {
+    throw new Error("Document not found or unauthorized");
+  }
+
+  if (document.type !== "file") {
+    throw new Error("Only files can be viewed");
+  }
+
+  const absolutePath = path.join(process.cwd(), document.url);
+  if (!fs.existsSync(absolutePath)) {
+    throw new Error("Physical file not found");
+  }
+
+  return absolutePath;
+};
+
 export const DocumentService = {
   createFolder,
   uploadFile,
@@ -455,4 +474,5 @@ export const DocumentService = {
   duplicateDocument,
   renameDocument,
   deleteDocument,
+  getFileDetails,
 };

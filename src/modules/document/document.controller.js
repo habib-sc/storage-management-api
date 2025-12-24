@@ -198,6 +198,17 @@ const deleteDocument = async (req, res, next) => {
   }
 };
 
+// view document controller (secure streaming)
+const viewDocument = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const absolutePath = await DocumentService.getFileDetails(id, req.user.id);
+    res.sendFile(absolutePath);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const DocumentController = {
   createFolder,
   uploadFile,
@@ -210,4 +221,5 @@ export const DocumentController = {
   copyToFolder,
   renameDocument,
   deleteDocument,
+  viewDocument,
 };
