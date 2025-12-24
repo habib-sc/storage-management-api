@@ -3,6 +3,7 @@ import path from "path";
 import fs from "fs";
 import mongoose from "mongoose";
 import User from "../user/user.model.js";
+import Favourite from "./favourite.model.js";
 
 // Create a new folder
 const createFolder = async (folderData, ownerId) => {
@@ -240,10 +241,49 @@ const getDashboardStats = async (user) => {
   return dashboardData;
 };
 
+// toggle favourite service
+const toggleFavourite = async (documentId, userId) => {
+  // Check if document exists
+  const document = await Document.findById(documentId);
+  if (!document) {
+    throw new Error("Document not found");
+  }
+
+  // Check if already favourited
+  const existingFavourite = await Favourite.findOne({
+    user: userId,
+    document: documentId,
+  });
+
+  if (existingFavourite) {
+    // If exists, remove it
+    await Favourite.findByIdAndDelete(existingFavourite._id);
+    return { isFavourite: false };
+  } else {
+    // If doesn't exist, create it
+    await Favourite.create({
+      user: userId,
+      document: documentId,
+    });
+    return { isFavourite: true };
+  }
+};
+
+// get favourite documents service
+const getFavouriteDocuments = async (userId) => {
+  const favourites = await Favourite.find({ user: userId }).populate(
+    "document"
+  );
+
+  return { totalItems: favourites.length, content: favourites };
+};
+
 export const DocumentService = {
   createFolder,
   uploadFile,
   createTextFile,
   getFolderContent,
   getDashboardStats,
+  toggleFavourite,
+  getFavouriteDocuments,
 };

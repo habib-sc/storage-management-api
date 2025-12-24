@@ -95,10 +95,45 @@ const getDashboardStats = async (req, res, next) => {
   }
 };
 
+// toggle favourite controller
+const toggleFavourite = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const result = await DocumentService.toggleFavourite(id, req.user.id);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: result.isFavourite
+        ? "Document marked as favourite"
+        : "Document removed from favourites",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// get favourite documents controller
+const getFavouriteDocuments = async (req, res, next) => {
+  try {
+    const result = await DocumentService.getFavouriteDocuments(req.user.id);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Favourite documents retrieved successfully",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const DocumentController = {
   createFolder,
   uploadFile,
   createTextFile,
   getFolderContent,
   getDashboardStats,
+  toggleFavourite,
+  getFavouriteDocuments,
 };

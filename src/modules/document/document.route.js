@@ -15,5 +15,11 @@ router.post(
 router.post("/text", auth(), DocumentController.createTextFile);
 router.get("/stats", auth(), DocumentController.getDashboardStats);
 router.get("/", auth(), DocumentController.getFolderContent);
+router.get("/favourites", auth(), DocumentController.getFavouriteDocuments);
+router.patch(
+  "/favourite-toggle/:id",
+  auth(),
+  DocumentController.toggleFavourite
+);
 
 export const DocumentRoutes = router;
