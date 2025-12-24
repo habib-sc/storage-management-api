@@ -108,6 +108,24 @@ const getFolderContent = async (queryParams, ownerId) => {
     }
   });
 
+  const andConditions = [];
+
+  if (queryParams.type === "image") {
+    andConditions.push({
+      extension: { $in: [".jpg", ".jpeg", ".png", ".gif", ".webp"] },
+    });
+    queries.type = "file";
+  }
+
+  if (queryParams.type === "note") {
+    andConditions.push({ extension: ".txt" });
+    queries.type = "file";
+  }
+
+  if (andConditions.length > 0) {
+    queries.$and = andConditions;
+  }
+
   queries.owner = ownerId;
   queries.parentFolder = queryParams.parentFolder
     ? queryParams.parentFolder
