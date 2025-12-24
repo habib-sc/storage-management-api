@@ -34,6 +34,10 @@ const userSchema = new mongoose.Schema(
       default: null,
       select: false,
     },
+    totalStorageCapacity: {
+      type: Number,
+      default: 5 * 1024 * 1024 * 1024, // 5GB in bytes
+    },
   },
   {
     timestamps: true,

@@ -80,9 +80,25 @@ const getFolderContent = async (req, res, next) => {
   }
 };
 
+// get dashboard stats controller
+const getDashboardStats = async (req, res, next) => {
+  try {
+    const result = await DocumentService.getDashboardStats(req.user);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Dashboard statistics retrieved successfully",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const DocumentController = {
   createFolder,
   uploadFile,
   createTextFile,
   getFolderContent,
+  getDashboardStats,
 };
